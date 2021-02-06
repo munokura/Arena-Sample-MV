@@ -178,7 +178,7 @@
                 //予備スキルの指定がない場合
                 if (this.subject().confusionLevel() <= 2) {                                   // 敵を攻撃できる行動制約
                     this.setAttack();
-                } else if (this.subject().friendUnit().aliveMembers().length > 1) {           // 味方が自分のほかに存在する
+                } else if (this.subject().friendsUnit().aliveMembers().length > 1) {           // 味方が自分のほかに存在する
                     this.setAttack();
                 } else {
                     console.log(this.subject().name(), ":", "使えるスキルがなく、予備スキルの指定もないので防御");
@@ -349,7 +349,8 @@
         };                    
     } else {
         Game_Action.prototype.setConfusion = function() {
-            if (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitch.value(TargetExValidSwitchId) )&&
+            console.log(this.subject().friendsUnit().aliveMembers().length);
+            if ((!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitch.value(TargetExValidSwitchId))) &&
                  this.subject().confusionLevel() === 3 && 
                  this.subject().friendsUnit().aliveMembers().length < 2) {
                     console.log(this.subject().name(), ":", "攻撃対象がいないので防御");
@@ -365,9 +366,9 @@
             case 1:
                 return this.opponentsUnit().randomTarget();
             case 2:
-                if (!TargetExValidSwitchId || ((TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId) &&
+                if (((!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) &&
                     this.subject().friendsUnit().aliveMembers().length < 2) ||  // 味方が自分しかいない
-                    Math.randomInt(2) === 0)) {                                // もしくは抽選で敵への攻撃が選ばれた
+                    Math.randomInt(2) === 0) {                                  // もしくは抽選で敵への攻撃が選ばれた
                         return this.opponentsUnit().randomTarget();
                 }
                 return (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) ? this.friendsUnit().randomTargetWithoutMe(this.subject()) : this.friendUnit().randomTarget();
