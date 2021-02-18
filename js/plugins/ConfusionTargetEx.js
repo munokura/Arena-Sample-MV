@@ -87,7 +87,7 @@
  * 
  */
 
-(()=>{
+(() => {
     'use strict'
 
     //混乱ステート拡張プラグインが有効かのチェックフラグ
@@ -99,16 +99,16 @@
 
 
     //狙われ率設定の拡張版
-    Game_Unit.prototype.tgrSumEx = function(candidacies) {
+    Game_Unit.prototype.tgrSumEx = function (candidacies) {
         return candidacies.reduce((r, candidacy) => r + candidacy.tgr, 0);
     };
-    
+
     //対象から自身を排除する
-    Game_Unit.prototype.randomTargetWithoutMe = function(subject) {
+    Game_Unit.prototype.randomTargetWithoutMe = function (subject) {
         var candidacies = this.aliveMembers().filter(member => member !== subject);
         var tgrRand = Math.random() * this.tgrSumEx(candidacies);
         var target = null;
-        candidacies.forEach(function(candidacy) {
+        candidacies.forEach(function (candidacy) {
             tgrRand -= candidacy.tgr;
             if (tgrRand <= 0 && !target) {
                 target = candidacy;
@@ -118,12 +118,12 @@
     };
 
     // 対象に自身も入れる
-    Game_Unit.prototype.randomTargetWithMe = function(subject) {
+    Game_Unit.prototype.randomTargetWithMe = function (subject) {
         var candidacies = this.aliveMembers();
         candidacies.push(subject);
         var tgrRand = Math.random() * this.tgrSumEx(candidacies);
         var target = null;
-        candidacies.forEach(function(candidacy) {
+        candidacies.forEach(function (candidacy) {
             tgrRand -= candidacy.tgr;
             if (tgrRand <= 0 && !target) {
                 target = candidacy;
@@ -133,30 +133,30 @@
     };
 
     if (isActiveConfusionExtend) {    // 混乱ステート拡張プラグインが導入されているとき
-        console.log("ConfusionExtend is Active")
+        // console.log("ConfusionExtend is Active")
         var metaTagPrefix = 'CE';
-    
-        var getArgNumber = function(arg, min, max) {
+
+        var getArgNumber = function (arg, min, max) {
             if (arguments.length < 2) min = -Infinity;
             if (arguments.length < 3) max = Infinity;
             return (parseInt(convertEscapeCharacters(arg), 10) || 0).clamp(min, max);
         };
 
-        var getMetaValue = function(object, name) {
+        var getMetaValue = function (object, name) {
             var metaTagName = metaTagPrefix + (name ? name : '');
             return object.meta.hasOwnProperty(metaTagName) ? object.meta[metaTagName] : undefined;
         };
 
-        var getMetaValues = function(object, names) {
+        var getMetaValues = function (object, names) {
             if (!Array.isArray(names)) return getMetaValue(object, names);
             for (var i = 0, n = names.length; i < n; i++) {
                 var value = getMetaValue(object, names[i]);
                 if (value !== undefined) return value;
             }
             return undefined;
-        };    
+        };
 
-        Game_Action.prototype.setConfusionSpareSkill = function() {
+        Game_Action.prototype.setConfusionSpareSkill = function () {
             var state = this.getRestrictState();
             var value = getMetaValues(state, ['予備スキル', 'SpareSkill']);
             if (value) {
@@ -166,12 +166,12 @@
                 }
                 else if (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) {
                     //予備スキルも使用できない
-                    if (this.subject().confusionLevel() <= 2){                              // 敵を攻撃できる行動制約
+                    if (this.subject().confusionLevel() <= 2) {                              // 敵を攻撃できる行動制約
                         this.setAttack();
                     } else if (this.subject().friendsUnit().aliveMembers().length > 1) {    // 味方が自分のほかに存在する
                         this.setAttack();
-                    } else {                                                                  
-                        console.log(this.subject().name(), ":", "予備スキルも含め、使用できるスキルがないので防御");
+                    } else {
+                        // console.log(this.subject().name(), ":", "予備スキルも含め、使用できるスキルがないので防御");
                         this.setGuard();
                     }
                 }
@@ -183,19 +183,19 @@
                 } else if (this.subject().friendsUnit().aliveMembers().length > 1) {           // 味方が自分のほかに存在する
                     this.setAttack();
                 } else {
-                    console.log(this.subject().name(), ":", "使えるスキルがなく、予備スキルの指定もないので防御");
+                    // console.log(this.subject().name(), ":", "使えるスキルがなく、予備スキルの指定もないので防御");
                     this.setGuard();
                 }
             }
         };
 
         //使用効果に回復タブの効果、ステート解除、能力強化、弱体解除の効果があるかチェックする関数
-        Game_Action.prototype.isRecoverEffect = function(){
+        Game_Action.prototype.isRecoverEffect = function () {
             return this.item().damage.type === 0 && this.item().effects.some(effect => [11, 12, 13, 22, 31, 34].contains(effect.code));
         };
-    
+
         //回復魔法を使うときは自身もターゲットに含めるように変更
-        Game_Action.prototype.targetsForOpponentsWithMe = function() {
+        Game_Action.prototype.targetsForOpponentsWithMe = function () {
             var targets = [];
             var unit = this.opponentsUnit();
             if (this.isForRandom()) {
@@ -205,11 +205,11 @@
             } else if (this.isForOne()) {
                 if (this._targetIndex < 0) {
                     if (!TargetExValidSwitchId || ((TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId)) &&
-                         (this.isHpRecover() || this.isMprecover() || this.isRecoverEffect())) && BehaviorOfRecoverAll < 2) {
-                             targets.push(unit.randomTargetWithMe(this.subject()));
-                         } else {
-                             targets.push(unit.randomTarget());
-                         }
+                        (this.isHpRecover() || this.isMprecover() || this.isRecoverEffect())) && BehaviorOfRecoverAll < 2) {
+                        targets.push(unit.randomTargetWithMe(this.subject()));
+                    } else {
+                        targets.push(unit.randomTarget());
+                    }
                 } else {
                     targets.push(unit.smoothTarget(this._targetIndex));
                 }
@@ -217,26 +217,26 @@
                 targets = unit.aliveMembers();
                 if (!TargetExValidSwitchId || ((TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId)) &&
                     (this.isHpRecover() || this.isMprecover() || this.isRecoverEffect())) && BehaviorOfRecoverAll < 2) {
-                        targets.push(this.subject());
+                    targets.push(this.subject());
                 }
             }
             return targets;
         };
 
         const CTEX_Game_Action_confusionTarget = Game_Action.prototype.confusionTarget;
-        Game_Action.prototype.confusionTarget = function() {
-            if(!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))){
+        Game_Action.prototype.confusionTarget = function () {
+            if (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) {
                 return this.confusionSkillTarget();
             }
             return CTEX_Game_Action_confusionTarget.apply(this, arguments);
         };
-    
+
         //敵ターゲットの決定法を変更
-        Game_Action.prototype.confusionSkillTarget = function() {
+        Game_Action.prototype.confusionSkillTarget = function () {
             var state = this.getRestrictState();
             var value = getMetaValues(state, ['ターゲット', 'Target']);
             if (value) {
-                var index         = getArgNumber(value, -1);
+                var index = getArgNumber(value, -1);
                 this._targetIndex = (index === -1 ? this.subject().getLastTargetIndex() : index);
             }
             if (this.isForUser()) {
@@ -244,8 +244,8 @@
             }
             return this.isConfusionSkillTargetForFriend() ? this.targetsForConfusionFriends() : this.targetsForOpponentsWithMe();
         };
-    
-        Game_Action.prototype.targetsForConfusionFriends = function() {
+
+        Game_Action.prototype.targetsForConfusionFriends = function () {
             if (this.isForRandom()) {
                 var targets = [];
                 var unit = this.friendsUnit();
@@ -261,8 +261,8 @@
                 return this.targetsForFriends();
             }
         };
-        
-        Game_Action.prototype.targetsForFriends = function() {
+
+        Game_Action.prototype.targetsForFriends = function () {
             var targets = [];
             var unit = this.friendsUnit();
             if (this.isForUser()) {
@@ -276,13 +276,13 @@
             } else if (this.isForOne()) {
                 if (this._targetIndex < 0) {
                     if (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) {
-                        if (this.isHpRecover() || this.isMpRecover() || this.isRecoverEffect()){
-                            if (0 < BehaviorOfRecoverAll){
+                        if (this.isHpRecover() || this.isMpRecover() || this.isRecoverEffect()) {
+                            if (0 < BehaviorOfRecoverAll) {
                                 targets = [this.subject()];
-                            } else{
+                            } else {
                                 targets.push(unit.randomTarget());
                             }
-                        } else{
+                        } else {
                             targets.push(unit.randomTargetWithoutMe(this.subject()));
                         }
 
@@ -295,29 +295,29 @@
             } else {
                 targets = unit.aliveMembers();
                 if (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) {
-                    if (this.isHpRecover() || this.isMpRecover() || this.isRecoverEffect()){
+                    if (this.isHpRecover() || this.isMpRecover() || this.isRecoverEffect()) {
                         if (0 < BehaviorOfRecoverAll) {
                             targets = [this.subject()];
                         }
                     } else {
                         targets = targets.filter(target => target !== this.subject());
-                    }                        
+                    }
                 }
             }
             return targets;
         };
 
-        Game_BattlerBase.prototype.isAnyTargetWithoutSelf = function(skill) {
-            if(!TargetExValidSwitchId || (TargetExValidSwitchId && !$gameSwitches.value(TargetExValidSwitchId))) {
+        Game_BattlerBase.prototype.isAnyTargetWithoutSelf = function (skill) {
+            if (!TargetExValidSwitchId || (TargetExValidSwitchId && !$gameSwitches.value(TargetExValidSwitchId))) {
                 return true;
             }
-            if(!this.isConfused()) {                        // 混乱していない               
+            if (!this.isConfused()) {                        // 混乱していない               
                 return true;
             }
-            if(this.confusionLevel() <= 2) {                // 敵を攻撃できる行動制約
+            if (this.confusionLevel() <= 2) {                // 敵を攻撃できる行動制約
                 return true;
             }
-            if([7, 8, 9, 10, 11].contains(skill.scope)) {   // 味方が対象のスキル
+            if ([7, 8, 9, 10, 11].contains(skill.scope)) {   // 味方が対象のスキル
                 return true;
             }
             var unit = this.isActor() ? $gameParty : $gameTroop;
@@ -325,57 +325,57 @@
 
         };
 
-        Game_BattlerBase.prototype.meetsSkillConditions = function(skill) {
+        Game_BattlerBase.prototype.meetsSkillConditions = function (skill) {
             return (this.meetsUsableItemConditions(skill) &&
-                    this.isAnyTargetWithoutSelf(skill) &&
-                    this.isSkillWtypeOk(skill) && this.canPaySkillCost(skill) &&
-                    !this.isSkillSealed(skill.id) && !this.isSkillTypeSealed(skill.stypeId));
+                this.isAnyTargetWithoutSelf(skill) &&
+                this.isSkillWtypeOk(skill) && this.canPaySkillCost(skill) &&
+                !this.isSkillSealed(skill.id) && !this.isSkillTypeSealed(skill.stypeId));
         };
 
-        Game_Action.prototype.isConfusionSkillTargetForFriend = function() {
-            console.log("攻撃対象のチェック");
+        Game_Action.prototype.isConfusionSkillTargetForFriend = function () {
+            // console.log("攻撃対象のチェック");
             switch (this.subject().confusionLevel()) {
                 case 1:
                     return this.isForFriend();
                 case 2:
                     if (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId) &&
                         this.isForOpponent() && this.subject().friendsUnit().aliveMembers().length < 2)) {
-                            console.log(this.subject().name(), ":", "味方が自分以外いないので、強制的に敵を攻撃");
-                            return false;
+                        // console.log(this.subject().name(), ":", "味方が自分以外いないので、強制的に敵を攻撃");
+                        return false;
                     }
                     return Math.randomInt(2) === 0;
                 case 3:
                     return !this.isConfusionSkillTargetReverse();
             }
             return false;
-        };                    
+        };
     } else {
-        Game_Action.prototype.setConfusion = function() {
-            console.log(this.subject().friendsUnit().aliveMembers().length);
+        Game_Action.prototype.setConfusion = function () {
+            // console.log(this.subject().friendsUnit().aliveMembers().length);
             if ((!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitch.value(TargetExValidSwitchId))) &&
-                 this.subject().confusionLevel() === 3 && 
-                 this.subject().friendsUnit().aliveMembers().length < 2) {
-                    console.log(this.subject().name(), ":", "攻撃対象がいないので防御");
-                    this.setGuard();
+                this.subject().confusionLevel() === 3 &&
+                this.subject().friendsUnit().aliveMembers().length < 2) {
+                // console.log(this.subject().name(), ":", "攻撃対象がいないので防御");
+                this.setGuard();
             }
             else {
                 this.setAttack();
             }
         };
-        
-        Game_Action.prototype.confusionTarget = function() {
+
+        Game_Action.prototype.confusionTarget = function () {
             switch (this.subject().confusionLevel()) {
-            case 1:
-                return this.opponentsUnit().randomTarget();
-            case 2:
-                if (((!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) &&
-                    this.subject().friendsUnit().aliveMembers().length < 2) ||  // 味方が自分しかいない
-                    Math.randomInt(2) === 0) {                                  // もしくは抽選で敵への攻撃が選ばれた
+                case 1:
+                    return this.opponentsUnit().randomTarget();
+                case 2:
+                    if (((!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) &&
+                        this.subject().friendsUnit().aliveMembers().length < 2) ||  // 味方が自分しかいない
+                        Math.randomInt(2) === 0) {                                  // もしくは抽選で敵への攻撃が選ばれた
                         return this.opponentsUnit().randomTarget();
-                }
-                return (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) ? this.friendsUnit().randomTargetWithoutMe(this.subject()) : this.friendUnit().randomTarget();
-            default:
-                return (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) ? this.friendsUnit().randomTargetWithoutMe(this.subject()) : this.friendUnit().randomTarget();
+                    }
+                    return (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) ? this.friendsUnit().randomTargetWithoutMe(this.subject()) : this.friendUnit().randomTarget();
+                default:
+                    return (!TargetExValidSwitchId || (TargetExValidSwitchId && $gameSwitches.value(TargetExValidSwitchId))) ? this.friendsUnit().randomTargetWithoutMe(this.subject()) : this.friendUnit().randomTarget();
             }
         };
     }
